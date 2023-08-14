@@ -1,0 +1,820 @@
+openapi: 3.0.0
+info:
+  title: Описание АПИ Handmade
+  version: 2.0.0
+  description: Описание методов для работы с сервисом Handmade. Авторизация происходит по токену. Чтобы получить токен обратитесь в чат поддержки.
+servers:
+  - url: https://api.gogochanger.com/api/v2
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    ValidationError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: 'false'
+        message:
+          type: object
+          example: {
+            'field': ['Некоррктно заполнено', 'Должно быть одним из значений']
+          }
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: 'false'
+        message:
+          type: string
+          example: 'Ошибка сервера'
+    NotFound:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: 'false'
+        message:
+          type: string
+          example: 'Сущность не найдена'
+    TypePayment:
+      type: object
+      properties:
+        id:
+          type: integer
+          enum: [ 1, 2 ]
+        title:
+          type: string
+          enum: [ Входящий, Исходящий ]
+    CustomerData:
+      type: object
+      properties:
+        card:
+          type: string
+          example: '1234432255552222'
+        fio:
+          type: string
+          example: 'Иванов Иван Иваныч'
+        realFio:
+          type: string
+          example: 'Иванов Михаил Алексеевич'
+    Agent:
+      type: object
+      properties:
+        fio:
+          type: string
+          example: 'Иванов Иван Иваныч'
+        age:
+          type: integer
+          example: '23'
+        city:
+          type: string
+          example: 'Москва'
+        card:
+          type: integer
+          example: '4313451552255234'
+    Status:
+      type: object
+      properties:
+        id:
+          type: integer
+          enum: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        title:
+          type: string
+          enum: [ В обработке, Получено (Входящий), Не получено (Входящий), Выполнено (Исходящий), Не выполнено (Исходящий), Неизвестный платеж (Входящий), Ожидает принятия (Исходящий), Ожидает возврата (Входящий), Оформлен возврат (Входящий), Отменена ]
+    Currency:
+      type: object
+      properties:
+        id:
+          type: integer
+          enum: [ 1, 2, 3, 4, 5 ]
+        title:
+          type: string
+          enum: [ Руб, Гривна, Бад, Тенге, Сум ]
+        code:
+          type: string
+          example: RUB
+    Balance:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/Provider'
+        amount:
+          type: number
+        currency:
+          $ref: '#/components/schemas/Currency'
+        lastModified:
+          type: string
+          example: '2023-03-13T07:11:19.000000Z'
+    Limit:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/Provider'
+        limitIn:
+          type: number
+          example: 1200000
+        limitOut:
+          type: number
+          example: 1200000
+        currency:
+          $ref: '#/components/schemas/Currency'
+    Order:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          enum: [ Успешно ]
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: '12345'
+            type:
+              $ref: '#/components/schemas/TypePayment'
+            fee:
+              type: number
+              example: '100'
+            transactionId:
+              type: string
+              example: 'b5ed5331-864f-484d-9e28-dd33b29e418e'
+            customer:
+              $ref: '#/components/schemas/CustomerData'
+            agents:
+              type: array
+              items:
+                $ref: '#/components/schemas/Agent'
+            provider:
+              nullable: true
+              oneOf:
+                - $ref: '#/components/schemas/Provider'
+            status:
+              $ref: '#/components/schemas/Status'
+            lastModified:
+              type: string
+              example: '2023-03-13T07:11:19.000000Z'
+            amount:
+              type: number
+              example: '500'
+            realAmount:
+              type: number
+              example: '1000'
+            currency:
+              $ref: '#/components/schemas/Currency'
+            paymentUrl:
+              type: string
+              nullable: true
+              example: 'https://gogochanger.com/order/b5ed5331-864f-484d-9e28-dd33b29e418e'
+    Orders:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: 'true'
+        message:
+          type: string
+          enum: [ Успешно ]
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 1000
+            offset:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 500
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+    Balances:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: 'true'
+        message:
+          type: string
+          enum: [ Успешно ]
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Balance'
+    Limits:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: 'true'
+        message:
+          type: string
+          enum: [ Успешно ]
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Limit'
+    BanksList:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 'Успешно'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bank'
+    Provider:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Сбер'
+    UnitedBalances:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: 'true'
+        message:
+          type: string
+          enum: [ Успешно ]
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnitedBalance'
+    UnitedBalance:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: '12345.12'
+        currencyCode:
+          type: string
+          example: 'RUB'
+    Bank:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Сбербанк'
+        currencyCode:
+          type: string
+          example: 'RUB'
+        imageUrl:
+          type: string
+          example: 'https://example.com/sber.png'
+security:
+  - bearerAuth: [ ]
+paths:
+  /order/in:
+    post:
+      tags:
+        - Создание входящего платежа
+      summary: 'Входящяя заявка'
+      description: В случае если не передали bankId, карта будет выдана любого доступного банка, согласно переданой валюты
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactionId:
+                  type: string
+                  description: Идентификатор транзакции клиента
+                  example: 'b5ed5331-864f-484d-9e28-dd33b29e418e'
+                amount:
+                  type: number
+                  description: Сумма операции
+                  example: '1001'
+                customerName:
+                  type: string
+                  description: ФИО клиента
+                  example: 'Хмеликов Михаил Александрович'
+                bank:
+                  type: integer
+                  example: '1'
+                  nullable: true
+                  enum: [1,2,3,4,5,6,8,9,11,12]
+                  description: >
+                    Идентификатор банка:
+                      * `1` - Сбербанк
+                      * `2`  - Тинькофф
+                      * `3`  - Альфа-банк
+                      * `4`  - ВТБ
+                      * `5`  - Приват-банк
+                      * `6`  - Монобанк
+                      * `8`  - ФортеБанк
+                      * `9`  - Узкард-банк
+                      * `11` - Каспи-банк
+                      * `12` - ПУМБ
+                currency:
+                  type: integer
+                  nullable: true
+                  description: >
+                    Идентификатор валюты:
+                    * `1` - Рубли (По умолчанию)
+                    * `2` - Гривны
+                    * `3` - Тенге
+                    * `4` - Узбекский сум
+                  example: '1'
+                  enum: [1,2,3,4]
+                  default: 1
+                customerIp:
+                  type: string
+                  example: 111.222.333.444
+                  nullable: true
+                  description: IP-адрес
+                customerUserId:
+                  type: string
+                  example: 56
+                  nullable: true
+                  description: Идентификатор пользователя
+                currencyCode:
+                  type: string
+                  nullable: true
+                  description: >
+                    Трехбуквенный код валюты по стандарту ISO 4217.
+                  example: 'RUB'
+              required:
+                - transactionId
+                - amount
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '422':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /order/out:
+    post:
+      tags:
+        - Создание исходящего платежа
+      summary: 'Исходящяя заявка'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactionId:
+                  type: string
+                  description: Идентификатор транзакции клиента
+                  example: 'b5ed5331-864f-484d-9e28-dd33b29e418e'
+                amount:
+                  type: number
+                  description: Сумма операции
+                  example: '1001'
+                customerCard:
+                  type: string
+                  description: Карта клиента
+                  example: '4242424242424242'
+                customerName:
+                  type: string
+                  nullable: true
+                  description: ФИО клиента
+                  example: 'Хмеликов Михаил Александрович'
+                bank:
+                  type: integer
+                  example: '1'
+                  nullable: true
+                  enum: [1,2,3,4,5,6,8,9,11,12]
+                  description: >
+                    Идентификатор банка:
+                      * `1` - Сбербанк
+                      * `2`  - Тинькофф
+                      * `3`  - Альфа-банк
+                      * `4`  - ВТБ
+                      * `5`  - Приват-банк
+                      * `6`  - Монобанк
+                      * `8`  - ФортеБанк
+                      * `9`  - Узкард-банк
+                      * `11` - Каспи-банк
+                      * `12` - ПУМБ
+                currency:
+                  type: integer
+                  nullable: true
+                  description: >
+                    Идентификатор валюты:
+                    * `1` - Рубли (По умолчанию)
+                    * `2` - Гривны
+                    * `3` - Тенге
+                    * `4` - Узбекский сум
+                  example: '1'
+                  enum: [1,2,3,4]
+                  default: 1
+                currencyCode:
+                  type: string
+                  nullable: true
+                  description: >
+                    Трехбуквенный код валюты по стандарту ISO 4217.
+                  example: 'RUB'
+              required:
+                - transactionId
+                - amount
+                - customerCard
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '422':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Сервисная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /order/{order}/payed:
+    post:
+      tags:
+        - Уведомить о том что клиент оплатил
+      summary: 'Клиент оплатил заявку'
+      description: Этот запрос не подтверждает оплату, а лишь сообщает нам информацию, что данную заявку нужно проверить на получение оплаты
+      parameters:
+        - name: order
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12345'
+          description: 'Наш идентификатор заявки'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Заявка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /order/{order}/cancel:
+    post:
+      tags:
+        - Отменить платеж
+      summary: 'Отмена платежа возможна, если он не имеет финальный статус'
+      parameters:
+        - name: order
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12345'
+          description: 'Наш идентификатор заявки'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Заявка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /order/{order}/status:
+    get:
+      tags:
+        - Получить информацию о заявки
+      summary: 'Статус заявки'
+      parameters:
+        - name: order
+          in: path
+          schema:
+            type: integer
+          required: true
+          example: '12345'
+          description: 'Наш идентификатор заявки'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Заявка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /orders:
+    get:
+      tags:
+        - Получение списка транзакций
+      summary: 'Список транзакций'
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: 'Y-m-d'
+            default: 'currentDate'
+          example: '2023-01-01'
+          description: 'Дата от'
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: 'YYYY-MM-DD'
+            default: 'currentDate'
+          example: '2023-01-01'
+          description: 'Дата по'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: '50'
+            minimum: 50
+            maximum: 500
+          example: '50'
+          description: 'Количество элементов на странице'
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+          example: 5
+          description: 'Смещение'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Orders'
+        '422':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /balances:
+    get:
+      tags:
+        - Получение балансов
+      summary: 'Ваши балансы с учетом зарезервированных средств'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balances'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /balances/united:
+    get:
+      tags:
+        - Получение объединенных по валюте балансов
+      summary: 'Сумма ваших балансов разных банков, сгруппированных по валюте'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnitedBalances'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /limits:
+    get:
+      tags:
+        - Доступные лимиты
+      summary: 'Получение лимитов'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Limits'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /banks/incoming:
+    get:
+      tags:
+        - Списки банков
+      summary: 'Получение списка банков для входящих платежей'
+      parameters:
+        - name: currencyCode
+          in: query
+          schema:
+            type: string
+          example: RUB
+          required: false
+          description: 'Код валюты, для которой нужно получить список банков'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BanksList'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /order/generate-payment-url:
+    post:
+      tags:
+        - Создание ссылки на платежную страницу
+      summary: 'Создание ссылки на платежную страницу'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactionId:
+                  type: string
+                  description: Идентификатор транзакции клиента
+                  example: 'b5ed5331-864f-484d-9e28-dd33b29e418e'
+                amount:
+                  type: number
+                  description: Сумма транзакции
+                  example: 1500
+                currencyCode:
+                  type: string
+                  description: Код валюты транзакции
+                  example: 'RUB'
+                customerName:
+                  type: string
+                  description: Имя клиента (опционально)
+                  example: 'Иванов Иван Иванович'
+                customerUserId:
+                  type: string
+                  description: Уникальный идентификатор клиента (опционально)
+                  example: 123
+                customerUserIp:
+                  type: string
+                  description: IP-адрес клиента (опционально)
+                  example: '192.168.1.1'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Успешно ли обработан запрос
+                    example: true
+                  message:
+                    type: string
+                    description: Сообщение
+                    example: Успешно
+                  data:
+                    type: string
+                    description: Сгенерированная ссылка на платежную страницу
+                    example: 'https://gogochanger.com/order/new/SMCLGRIXXDNsdsaJS'
+        '422':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
