@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: Описание АПИ Handmade
+  title: Документация PayKong API
   version: 2.0.0
-  description: Описание методов для работы с сервисом Handmade. Авторизация происходит по токену. Чтобы получить токен обратитесь в чат поддержки.
+  description: Описание методов для работы с сервисом PayKong. Авторизация происходит по токену. Чтобы получить токен обратитесь в чат поддержки.
 servers:
   - url: https://api.gogochanger.com/api/v2
 components:

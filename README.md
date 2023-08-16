@@ -4,7 +4,7 @@ Live: https://apidocs.paykong.io
 
 Specification: https://apidocs.paykong.io/openapi.yaml
 
-The repository is a part of the [GoGoChanger Organization](https://github.com/gogochanger-com). This project and everyone participating in it is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
+The repository is a part of the [PayKong Organization](https://github.com/paykong-io). This project and everyone participating in it is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Contributing
 
