@@ -1,8 +1,8 @@
-<h1 align="center">GoGoChanger API Documentation</h1>
+<h1 align="center">PayKong API Documentation</h1>
 
-Live: https://apidocs.gogochanger.com
+Live: https://apidocs.paykong.io
 
-Specification: https://apidocs.gogochanger.com/openapi.yaml
+Specification: https://apidocs.paykong.io/openapi.yaml
 
 The repository is a part of the [GoGoChanger Organization](https://github.com/gogochanger-com). This project and everyone participating in it is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
 
